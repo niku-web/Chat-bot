@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My AI Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a; /* dark background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chatbox {
+      width: 100%;
+      max-width: 420px;
+      height: 90vh;
+      background: #ffffff;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: #16a34a;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f1f5f9;
+    }
+    .msg {
+      margin: 6px 0;
+      padding: 8px 12px;
+      border-radius: 10px;
+      max-width: 80%;
+      font-size: 14px;
+    }
+    .user {
+      background: #2563eb;
+      color: white;
+      margin-left: auto;
+    }
+    .bot {
+      background: #e5e7eb;
+      color: #000;
+      margin-right: auto;
+    }
+    .input-box {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      font-size: 14px;
+      outline: none;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background: #16a34a;
+      color: white;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body><div class="chatbox">
+  <div class="header">🤖 AI Checkpost Chatbot</div>
+  <div class="chat" id="chat"></div>
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="Yahan likho..." />
+    <button onclick="sendMsg()">Send</button>
+  </div>
+</div><script>
+  const chat = document.getElementById('chat');
+
+  function addMsg(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + cls;
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function sendMsg() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMsg(text, 'user');
+    input.value = '';
+
+    addMsg('Soch raha hoon...', 'bot');
+
+    // ===== AI PART =====
+    // IMPORTANT: yahan apni API KEY lagani hai
+    const API_KEY = "AIzaSyAqruFw785k5MOBu_5lD3QjBopLj-J7spw";
+
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + API_KEY
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: text }]
+        })
+      });
+
+      const data = await res.json();
+      chat.removeChild(chat.lastChild);
+      addMsg(data.choices[0].message.content, 'bot');
+
+    } catch (e) {
+      chat.removeChild(chat.lastChild);
+      addMsg('Error: Internet ya API key check karo', 'bot');
+    }
+  }
+</script></body>
+</html>
